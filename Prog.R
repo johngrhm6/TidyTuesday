@@ -3,6 +3,8 @@ library(MetBrewer)
 library(showtext)
 library(ggnetwork)
 library(network)
+library(ggdark)
+library(gghighlight)
 
 
 font_families_google()
@@ -11,27 +13,23 @@ showtext_auto()
 
 
 colours<-met.brewer("Austria")
-colours[1]
 
 languages <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-03-21/languages.csv')
 
 
-net<-languages %>% 
-  filter(title=="R") %>% 
-  select(title,wikipedia_related) %>% 
-  separate_longer_delim(cols = wikipedia_related,delim = " ") %>% 
-  left_join(languages,by = c("wikipedia_related"="pldb_id")) %>% 
-  separate_longer_delim(cols = wikipedia_related.y,delim = " ") %>% 
-  select(wikipedia_related,wikipedia_related.y) %>%
-  filter(!is.na(wikipedia_related)& !is.na(wikipedia_related.y)) %>% 
-  network(loops = TRUE,directed = FALSE,multiple = TRUE) %>% 
-  ggnetwork()
 
-ggplot(data=net,aes(x=x,y=y,xend=xend,yend=yend))+
-  geom_edges()+
-  geom_nodes()+
-  theme_void()+
-  geom_nodetext_repel(aes(label=vertex.names))
+languages %>% 
+  filter(github_repo_issues>1 & github_repo_subscribers>1) %>% 
+  ggplot()+
+  geom_point(aes(github_repo_subscribers,github_repo_issues),color="#39ff14",size=1)+
+  scale_x_log10()+
+  scale_y_log10()+
+  dark_theme_minimal(base_family = "Dokdo")+
+  gghighlight(github_repo_issues> quantile(github_repo_issues,0.75)+10*IQR(github_repo_issues)|
+                github_repo_issues< quantile(github_repo_issues,0.25)-2*IQR(github_repo_issues) ,
+              label_key = title,label_params = list(family="Dokdo",fill="#39ff14"))+
+  theme(panel.grid = element_blank(),
+        axis.title = element_text(color = "#39ff14"))
 
 
 
