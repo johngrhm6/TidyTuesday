@@ -1,4 +1,7 @@
-American Idol data
+
+![Idol](https://github.com/johngrhm6/TidyTuesday/blob/main/2024/2024-07-23/idol.png)
+
+# American Idol data
 
 This week we're exploring American Idol data! This is a comprehensive dataset put together by kkakey.
 
